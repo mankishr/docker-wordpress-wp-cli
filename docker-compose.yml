@@ -1,0 +1,90 @@
+version: "3"
+
+services:
+  wordpress:
+    image: "wordpress:${WP_VERSION:-5.6.0}-php${PHP_VERSION:-7.4}-apache"
+    environment:
+      # HTTPS_METHOD: "nohttps"
+      VIRTUAL_HOST: "${DOCKER_DEV_DOMAIN}"
+      WORDPRESS_DB_HOST: "mysql"
+      WORDPRESS_DB_NAME: "gamescore"
+      WORDPRESS_DB_PASSWORD: "root123"
+      WORDPRESS_DB_USER: "root"
+    depends_on:
+      - "mysql"
+    networks:
+      - "front"
+      - "back"
+    volumes:
+      - "wp:/var/www/html:rw"
+      - "./certs/ca-root/ca.crt:/tmp/certs/root.crt:ro"
+      - "./conf/php-local.ini:/usr/local/etc/php/conf.d/local.ini:ro"
+      - "./conf/wp-local-config.php:/usr/local/etc/php/autoprepend.php:ro"
+      - "./src/wp/images:/var/www/html/wp-content/images"
+      - "./src/wp/languages:/var/www/html/wp-content/languages"
+      - "./src/wp/plugins:/var/www/html/wp-content/plugins"
+      - "./src/wp/themes:/var/www/html/wp-content/themes"
+  wp-cli:
+    image: "wordpress:cli-${WP_CLI_VERSION:-2.2.0}-php${PHP_VERSION:-7.3}"
+    environment:
+      - APACHE_RUN_USER="33"
+      - APACHE_RUN_GROUP="33"
+    user: "33:33"
+    depends_on:
+      - "mysql"
+    networks:
+      - "back"
+    volumes:
+      - "wp:/var/www/html:rw"
+      - "./bin/install-wp.sh:/usr/local/bin/install-wp:ro"
+      - "./conf/php-local.ini:/usr/local/etc/php/conf.d/local.ini:ro"
+      - "./conf/wp-local-config.php:/usr/local/etc/php/autoprepend.php:ro"
+      - "./src/wp/images:/var/www/html/wp-content/images"
+      - "./src/wp/languages:/var/www/html/wp-content/languages"
+      - "./src/wp/plugins:/var/www/html/wp-content/plugins"
+      - "./src/wp/themes:/var/www/html/wp-content/themes"
+  photon:
+    image: "chriszarate/photon:latest"
+    networks:
+      - "front"
+  mysql:
+    image: "mariadb:10.2"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "gamescore"
+      MYSQL_ROOT_PASSWORD: "root123"
+    networks:
+      - "back"
+    restart: on-failure
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - "mariadb:/var/lib/mysql"
+  proxy:
+    image: "jwilder/nginx-proxy:alpine"
+    environment:
+      HSTS: "off"
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - ./.env
+    networks:
+      front:
+        aliases:
+          - "${DOCKER_DEV_DOMAIN}"
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "./certs/self-signed:/etc/nginx/certs:ro"
+      - "./conf/nginx-proxy.conf:/etc/nginx/conf.d/proxy.conf:ro"
+      - "./conf/nginx-proxy-wordpress.conf:/etc/nginx/vhost.d/${DOCKER_DEV_DOMAIN}_location:ro"
+
+networks:
+  front: {}
+  back: {}
+
+volumes:
+  wp: {}
+  mariadb: {}
