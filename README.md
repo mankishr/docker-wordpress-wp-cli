@@ -1,4 +1,6 @@
 # Docker for wordpress with wp-cli container
+This is simplified version of this Docker-based environment setup https://github.com/chriszarate/docker-wordpress-vip-go
+It is created for the workshop so you can quickly install wordpress and test your plugins.
 
 ## Set up
 
