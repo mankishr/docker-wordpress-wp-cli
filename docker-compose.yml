@@ -10,6 +10,9 @@ services:
       WORDPRESS_DB_NAME: "gamescore"
       WORDPRESS_DB_PASSWORD: "root123"
       WORDPRESS_DB_USER: "root"
+      APACHE_RUN_USER: "www-data"
+      APACHE_RUN_GROUP: "www-data"
+    user: "www-data:www-data"
     depends_on:
       - "mysql"
     networks:
@@ -27,9 +30,9 @@ services:
   wp-cli:
     image: "wordpress:cli-${WP_CLI_VERSION:-2.2.0}-php${PHP_VERSION:-7.3}"
     environment:
-      - APACHE_RUN_USER="33"
-      - APACHE_RUN_GROUP="33"
-    user: "33:33"
+      - APACHE_RUN_USER="xfs"
+      - APACHE_RUN_GROUP="xfs"
+    user: "xfs:xfs"
     depends_on:
       - "mysql"
     networks:
@@ -43,10 +46,6 @@ services:
       - "./src/wp/languages:/var/www/html/wp-content/languages"
       - "./src/wp/plugins:/var/www/html/wp-content/plugins"
       - "./src/wp/themes:/var/www/html/wp-content/themes"
-  photon:
-    image: "chriszarate/photon:latest"
-    networks:
-      - "front"
   mysql:
     image: "mariadb:10.2"
     environment:
