@@ -61,7 +61,7 @@ domain, e.g., `project2.test`.
 ## Troubleshooting
 
 If your stack is not responding, the most likely cause is that a container has
-stopped or failed to start. Check to see if all of the containers are "Up":
+stopped or failed to start. Check to see if all of the containers are up and running:
 
 ```
 docker-compose ps
