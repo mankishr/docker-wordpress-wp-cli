@@ -2,7 +2,7 @@
 
 # Install WordPress.
 wp core install \
-  --title="Game score" \
+  --title="My wordpress site" \
   --admin_user="wordpress" \
   --admin_password="wordpress" \
   --admin_email="admin@mankis.hr" \
