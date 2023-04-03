@@ -6,10 +6,8 @@ services:
     environment:
       # HTTPS_METHOD: "nohttps"
       VIRTUAL_HOST: "${DOCKER_DEV_DOMAIN}"
-      WORDPRESS_DB_HOST: "mysql"
-      WORDPRESS_DB_NAME: "gamescore"
-      WORDPRESS_DB_PASSWORD: "root123"
-      WORDPRESS_DB_USER: "root"
+    env_file:
+      - "./.env"
     user: "www-data:www-data"
     depends_on:
       - "mysql"
@@ -28,6 +26,8 @@ services:
   wp-cli:
     image: "wordpress:cli-${WP_CLI_VERSION:-2.2.0}-php${PHP_VERSION:-7.3}"
     user: "${LOCAR_USER_UID}:${LOCAR_USER_GROUP}"
+    env_file:
+      - "./.env"
     depends_on:
       - "mysql"
     networks:
